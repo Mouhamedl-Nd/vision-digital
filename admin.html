@@ -1,0 +1,812 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin – Vision du Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0d1f4e;--sky:#3a8ef6;--cyan:#00b4d8;--lc:#38bdf8;--pur:#6366f1;--gr:#64748b;--li:#f8fafc;--gn:#22c55e;--rd:#ef4444;--or:#f59e0b;}
+body{font-family:'Sora',sans-serif;background:var(--li);color:var(--navy);overflow-x:hidden;}
+/* LOGIN */
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#081330,#0c1f55,#163880);position:relative;}
+.lw::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(56,189,248,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.05) 1px,transparent 1px);background-size:48px 48px;}
+.lb{position:relative;z-index:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:36px 30px;width:90%;max-width:420px;backdrop-filter:blur(18px);}
+.lb input{width:100%;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.87rem;outline:none;margin-bottom:12px;}
+.lb input::placeholder{color:rgba(255,255,255,.25);}
+.lb input:focus{border-color:var(--lc);}
+.lb-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--sky),var(--lc));color:#fff;border:none;border-radius:11px;font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;}
+.lerr{display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px 13px;color:#fca5a5;font-family:'Inter',sans-serif;font-size:.8rem;margin-bottom:12px;}
+/* LAYOUT */
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:240px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
+.sb-head{padding:16px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-logo img{height:30px;width:auto;filter:brightness(0) invert(1);}
+.sb-user{margin:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;}
+.sb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--rd),#dc2626);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;}
+.sb-name{font-size:.78rem;font-weight:700;color:#fff;}
+.sb-role{font-size:.65rem;color:rgba(255,255,255,.45);font-family:'Inter',sans-serif;}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.sb-lbl{font-size:.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.22);padding:0 10px;margin:12px 0 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;color:rgba(255,255,255,.5);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;}
+.sb-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sb-item.active{background:rgba(56,189,248,.12);color:var(--lc);font-weight:600;}
+.sb-item .ic{font-size:15px;width:19px;text-align:center;}
+.bc{display:inline-block;background:var(--rd);color:#fff;font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:100px;margin-left:auto;}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.06);}
+.btn-logout{display:flex;align-items:center;gap:8px;width:100%;padding:9px 11px;border-radius:9px;background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.18);font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;}
+/* MAIN */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.topbar h1{font-size:.97rem;font-weight:700;color:var(--navy);}
+.topbar p{font-family:'Inter',sans-serif;font-size:.75rem;color:var(--gr);margin-top:2px;}
+.content{padding:22px;flex:1;}
+/* SECTIONS */
+.section{display:none;} .section.active{display:block;}
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.sc{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:18px;}
+.sc .val{font-size:1.8rem;font-weight:800;margin-bottom:4px;}
+.sc .lbl{font-family:'Inter',sans-serif;font-size:.78rem;color:var(--gr);}
+.sc .ico{font-size:22px;margin-bottom:8px;}
+/* TABLE */
+.tw{background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;}
+.th{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.th h3{font-size:.9rem;font-weight:700;color:var(--navy);}
+.si{padding:8px 14px;border:1px solid #e2e8f0;border-radius:9px;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--navy);outline:none;width:200px;}
+.si:focus{border-color:var(--cyan);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#f8fafc;}
+th{padding:9px 14px;text-align:left;font-size:.7rem;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;}
+td{padding:11px 14px;font-size:.82rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbff;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700;}
+.badge.active{background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.22);}
+.badge.pending{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.22);}
+.badge.blocked{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.22);}
+/* ACTION BUTTONS */
+.ba{padding:5px 11px;border-radius:7px;font-family:'Sora',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.ba-act{background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.25)!important;}
+.ba-blk{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.25)!important;}
+.ba-wa{background:rgba(37,211,102,.12);color:#128c7e;border:1px solid rgba(37,211,102,.3)!important;}
+.ba-v{background:#f1f5f9;color:var(--navy);border:1px solid #e2e8f0!important;}
+.ba-ub{background:rgba(59,130,246,.1);color:#2563eb;border:1px solid rgba(59,130,246,.25)!important;}
+.ac{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;}
+.mo.open{display:flex;}
+.mb{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.mh{padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;}
+.mh h3{font-size:.95rem;font-weight:700;color:var(--navy);}
+.mc-btn{background:none;border:1px solid #e2e8f0;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--gr);}
+.mbody{padding:20px;}
+/* FORM */
+.fi{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;}
+.fi label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gr);}
+.fi input,.fi select{width:100%;padding:11px 13px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Sora',sans-serif;font-size:.85rem;color:var(--navy);outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.fi input:focus,.fi select:focus{border-color:var(--cyan);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.err-box{display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:10px 13px;color:#dc2626;font-family:'Inter',sans-serif;font-size:.82rem;margin-bottom:12px;}
+.ok-box{display:none;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:9px;padding:10px 13px;color:#16a34a;font-family:'Inter',sans-serif;font-size:.82rem;margin-bottom:12px;}
+.btn-p{width:100%;padding:13px;background:linear-gradient(135deg,var(--sky),var(--lc));color:#fff;border:none;border-radius:11px;font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:transform .2s;box-shadow:0 4px 18px rgba(58,142,246,.35);}
+.btn-p:hover{transform:translateY(-1px);}
+.btn-pur{background:linear-gradient(135deg,var(--pur),#8b5cf6)!important;box-shadow:0 4px 18px rgba(99,102,241,.35)!important;}
+/* FILTER TABS */
+.ftabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.ft{padding:7px 15px;border-radius:100px;font-family:'Sora',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:var(--gr);transition:all .2s;}
+.ft.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+/* CHART */
+.cb{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:18px;}
+.cb h4{font-size:.85rem;font-weight:700;margin-bottom:12px;}
+.bi{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bl{font-family:'Inter',sans-serif;font-size:.75rem;color:var(--gr);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bt{flex:1;background:#f1f5f9;border-radius:100px;height:8px;overflow:hidden;}
+.bf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--sky),var(--lc));}
+.bv{font-size:.72rem;font-weight:700;color:var(--navy);width:22px;text-align:right;}
+/* NOTIF */
+.nf{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:18px;margin-bottom:16px;}
+.nf h4{font-size:.88rem;font-weight:700;margin-bottom:12px;}
+.nf select,.nf textarea,.nf input[type=text]{width:100%;padding:10px 13px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Sora',sans-serif;font-size:.83rem;outline:none;margin-bottom:10px;}
+.nf textarea{resize:vertical;min-height:70px;}
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:11px 18px;border-radius:11px;font-size:.82rem;font-weight:600;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+/* PROG BAR */
+.pb{background:#e2e8f0;border-radius:100px;height:6px;overflow:hidden;flex:1;}
+.pf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--sky),var(--lc));}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="lp" class="lw">
+  <div class="lb">
+    <div style="text-align:center;margin-bottom:22px;">
+      <span style="font-size:1rem;font-weight:800;color:#fff;">JD <span style="color:#38bdf8;">Vision du Digital</span></span>
+      <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;font-size:.72rem;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:14px;">🔐 Espace Administrateur</div>
+      <h2 style="color:#fff;font-size:1.2rem;font-weight:800;margin-bottom:5px;">Connexion Admin</h2>
+      <p style="font-family:'Inter',sans-serif;font-size:.82rem;color:rgba(255,255,255,.4);">Accès réservé à l'équipe Vision du Digital</p>
+    </div>
+    <div class="lerr" id="lerr"></div>
+    <input type="email" id="l-email" placeholder="visiondudigital@gmail.com"/>
+    <input type="password" id="l-pw" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <button class="lb-btn" onclick="adminLogin()">Accéder au back-office →</button>
+    <p style="text-align:center;margin-top:14px;"><a href="index.html" style="font-family:'Inter',sans-serif;font-size:.75rem;color:rgba(255,255,255,.3);text-decoration:none;">← Retour au site</a></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash" style="display:none;">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <a href="index.html" class="sb-logo"><span style="font-size:1rem;font-weight:800;color:#fff;">JD <span style="color:#38bdf8;">Vision du Digital</span></span></a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av">ML</div>
+    <div class="sb-name" id="sb-name">Mouhamed Lamine</div>
+    <div class="sb-role" id="sb-role">👑 Admin Principal</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-lbl">Menu principal</div>
+    <button class="sb-item active" onclick="showSec('dashboard',this)"><span class="ic">📊</span> Tableau de bord</button>
+    <button class="sb-item" onclick="showSec('users',this)"><span class="ic">👥</span> Apprenants <span class="bc" id="pcount" style="display:none">0</span></button>
+    <button class="sb-item" onclick="showSec('formations',this)"><span class="ic">📚</span> Formations</button>
+    <button class="sb-item admin-only" onclick="showSec('stats',this)"><span class="ic">📈</span> Statistiques</button>
+    <button class="sb-item admin-only" onclick="showSec('notifs',this)"><span class="ic">🔔</span> Notifications</button>
+    <button class="sb-item admin-only" onclick="showSec('creer',this)"><span class="ic">➕</span> Créer un compte</button>
+    <button class="sb-item admin-only" onclick="showSec('mentors',this)"><span class="ic">🧑‍🏫</span> Mentors</button>
+    <div class="sb-lbl">Accès rapide</div>
+    <a href="index.html" class="sb-item"><span class="ic">🌐</span> Voir le site</a>
+    <a href="espace-cours.html" class="sb-item"><span class="ic">🎓</span> Espace cours</a>
+  </nav>
+  <div class="sb-foot">
+    <button class="btn-logout" onclick="adminLogout()">🚪 Se déconnecter</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+<div class="topbar">
+  <div><h1 id="tb-title">Tableau de bord</h1><p id="tb-date"></p></div>
+</div>
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="s-dashboard" class="section active">
+  <div class="stats-row" id="stats-row"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="tw"><div class="th"><h3>⏳ En attente de validation</h3></div><div id="plist"></div></div>
+    <div class="tw"><div class="th"><h3>🕐 Dernières inscriptions</h3></div><div id="rlist"></div></div>
+  </div>
+</div>
+
+<!-- APPRENANTS -->
+<div id="s-users" class="section">
+  <div class="ftabs" id="ftabs">
+    <button class="ft active" onclick="filterU('all',this)">Tous</button>
+    <button class="ft" onclick="filterU('active',this)">✅ Actifs</button>
+    <button class="ft" onclick="filterU('pending',this)">⏳ En attente</button>
+    <button class="ft" onclick="filterU('blocked',this)">🚫 Bloqués</button>
+  </div>
+  <div class="tw">
+    <div class="th"><h3>Liste des apprenants</h3><input class="si" type="text" placeholder="🔍 Rechercher..." oninput="searchU(this.value)"/></div>
+    <div style="overflow-x:auto;">
+      <table><thead><tr><th>Apprenant</th><th>Email</th><th>Formation</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody id="utbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- FORMATIONS -->
+<div id="s-formations" class="section">
+  <div class="tw"><div class="th"><h3>Apprenants par formation</h3></div>
+    <div style="overflow-x:auto;"><table><thead><tr><th>Formation</th><th>Inscrits</th><th>Actifs</th><th>En attente</th><th>Progression moy.</th></tr></thead>
+    <tbody id="ftbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="s-stats" class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;" id="chart-row"></div>
+  <div class="tw"><div class="th"><h3>📊 Progression des apprenants</h3></div>
+    <table><thead><tr><th>Apprenant</th><th>Formation</th><th>Cours</th><th>Progression</th><th>Dernière connexion</th></tr></thead>
+    <tbody id="ptbody"></tbody></table>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="s-notifs" class="section">
+  <div class="nf">
+    <h4>📢 Envoyer une notification</h4>
+    <select id="n-target"><option value="all">Tous les apprenants</option><option value="active">Actifs uniquement</option><option value="pending">En attente de paiement</option></select>
+    <input type="text" id="n-title" placeholder="Titre de la notification..."/>
+    <textarea id="n-text" placeholder="Message..."></textarea>
+    <button class="btn-p" onclick="sendNotif()">📤 Envoyer</button>
+  </div>
+  <div class="tw"><div class="th"><h3>Historique</h3></div><div id="nhistory"></div></div>
+</div>
+
+<!-- CRÉER UN COMPTE -->
+<div id="s-creer" class="section">
+  <div style="max-width:600px;">
+    <div class="tw" style="padding:24px;">
+      <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:5px;">➕ Créer un compte apprenant</h3>
+      <p style="font-family:'Inter',sans-serif;font-size:.82rem;color:var(--gr);margin-bottom:20px;">Créez directement le compte. Les identifiants seront envoyés par WhatsApp.</p>
+      <div class="err-box" id="c-err"></div>
+      <div class="ok-box" id="c-ok"></div>
+      <div class="fr">
+        <div class="fi"><label>Prénom *</label><input type="text" id="c-prenom" placeholder="Jean"/></div>
+        <div class="fi"><label>Nom *</label><input type="text" id="c-nom" placeholder="Dupont"/></div>
+      </div>
+      <div class="fi"><label>Email *</label><input type="email" id="c-email" placeholder="jean@exemple.com"/></div>
+      <div class="fi"><label>Téléphone WhatsApp *</label><input type="tel" id="c-tel" placeholder="+221 76 XXX XX XX"/></div>
+      <div class="fi"><label>Formation *</label>
+        <select id="c-formation">
+          <option value="" disabled selected>Choisissez une formation</option>
+          <option>Marketing Digital</option><option>Community Manager</option><option>Design Graphique</option>
+          <option>Développement Web</option><option>WordPress</option><option>Référencement (SEO)</option>
+          <option>Outils Google</option><option>Montage Vidéo</option><option>Analyse de données</option><option>Photographie</option>
+        </select>
+      </div>
+      <div class="fi"><label>Mot de passe *</label>
+        <div style="display:flex;gap:9px;">
+          <input type="text" id="c-pw" placeholder="Mot de passe" style="flex:1;"/>
+          <button onclick="genPw('c-pw','VDD')" style="padding:11px 14px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;border-radius:9px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;">🎲</button>
+        </div>
+      </div>
+      <button class="btn-p" onclick="creerCompte()">✅ Créer le compte et envoyer par WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENTORS -->
+<div id="s-mentors" class="section">
+  <div style="max-width:660px;">
+    <div class="tw" style="padding:24px;margin-bottom:18px;">
+      <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:5px;">🧑‍🏫 Ajouter un Mentor</h3>
+      <p style="font-family:'Inter',sans-serif;font-size:.82rem;color:var(--gr);margin-bottom:18px;">Un mentor peut accéder au back-office pour gérer les apprenants de sa formation.</p>
+      <div class="err-box" id="m-err"></div>
+      <div class="ok-box" id="m-ok"></div>
+      <div class="fr">
+        <div class="fi"><label>Prénom *</label><input type="text" id="m-prenom" placeholder="Jean"/></div>
+        <div class="fi"><label>Nom *</label><input type="text" id="m-nom" placeholder="Dupont"/></div>
+      </div>
+      <div class="fi"><label>Email *</label><input type="email" id="m-email" placeholder="mentor@exemple.com"/></div>
+      <div class="fi"><label>Téléphone</label><input type="tel" id="m-tel" placeholder="+221 76 XXX XX XX"/></div>
+      <div class="fi"><label>Formation assignée *</label>
+        <select id="m-formation">
+          <option value="" disabled selected>Choisissez une formation</option>
+          <option>Marketing Digital</option><option>Community Manager</option><option>Design Graphique</option>
+          <option>Développement Web</option><option>WordPress</option><option>Référencement (SEO)</option>
+          <option>Outils Google</option><option>Montage Vidéo</option><option>Analyse de données</option><option>Photographie</option>
+        </select>
+      </div>
+      <div class="fi"><label>Mot de passe *</label>
+        <div style="display:flex;gap:9px;">
+          <input type="text" id="m-pw" placeholder="Mot de passe mentor" style="flex:1;"/>
+          <button onclick="genPw('m-pw','Mentor')" style="padding:11px 14px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;border-radius:9px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;">🎲</button>
+        </div>
+      </div>
+      <button class="btn-p btn-pur" onclick="ajouterMentor()">🧑‍🏫 Ajouter ce Mentor</button>
+    </div>
+    <div class="tw"><div class="th"><h3>Liste des Mentors</h3></div><div id="mlist"></div></div>
+  </div>
+</div>
+
+</div></main></div></div>
+
+<!-- MODAL DÉTAIL APPRENANT -->
+<div class="mo" id="umodal">
+  <div class="mb">
+    <div class="mh"><h3 id="modal-name">Détail</h3><button class="mc-btn" onclick="closeModal()">✕</button></div>
+    <div class="mbody" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+var ADMIN_EMAIL = 'visiondudigital@gmail.com';
+var ADMIN_PASS  = 'Admin@VDD2025';
+var FORMATIONS  = ['Marketing Digital','Community Manager','Design Graphique','Développement Web','WordPress','Référencement (SEO)','Outils Google','Montage Vidéo','Analyse de données','Photographie'];
+var COURSE_CNT  = {'Marketing Digital':5,'Community Manager':5,'Design Graphique':5,'Développement Web':6,'WordPress':4,'Référencement (SEO)':5,'Outils Google':4,'Montage Vidéo':5,'Analyse de données':5,'Photographie':5};
+var allUsers    = [];
+var uFilter     = 'all';
+var notifHist   = JSON.parse(localStorage.getItem('vdd_notif_hist')||'[]');
+
+// ── AUTH ──────────────────────────────────────────────────────
+function adminLogin() {
+  var email = document.getElementById('l-email').value.trim();
+  var pw    = document.getElementById('l-pw').value;
+  var err   = document.getElementById('lerr');
+  err.style.display = 'none';
+  if(!email||!pw){ err.textContent='⚠️ Remplissez tous les champs.'; err.style.display='block'; return; }
+
+  if(email===ADMIN_EMAIL && pw===ADMIN_PASS){
+    localStorage.setItem('vdd_admin_logged','1');
+    localStorage.setItem('vdd_admin_role','principal');
+    localStorage.setItem('vdd_admin_name','Mouhamed Lamine');
+    localStorage.removeItem('vdd_admin_formation');
+    startDash(); return;
+  }
+  var mentors = JSON.parse(localStorage.getItem('vdd_mentors')||'[]');
+  var m = null;
+  for(var i=0;i<mentors.length;i++){ if(mentors[i].email===email && mentors[i].password===pw){m=mentors[i];break;} }
+  if(m){
+    localStorage.setItem('vdd_admin_logged','1');
+    localStorage.setItem('vdd_admin_role','mentor');
+    localStorage.setItem('vdd_admin_name', m.prenom+' '+m.nom);
+    localStorage.setItem('vdd_admin_formation', m.formation);
+    startDash(); return;
+  }
+  err.textContent='⚠️ Email ou mot de passe incorrect.'; err.style.display='block';
+}
+
+function adminLogout(){
+  if(confirm('Se déconnecter ?')){
+    localStorage.removeItem('vdd_admin_logged');
+    localStorage.removeItem('vdd_admin_role');
+    localStorage.removeItem('vdd_admin_name');
+    localStorage.removeItem('vdd_admin_formation');
+    document.getElementById('dash').style.display='none';
+    document.getElementById('lp').style.display='flex';
+  }
+}
+
+function startDash(){
+  document.getElementById('lp').style.display='none';
+  document.getElementById('dash').style.display='block';
+  document.getElementById('tb-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  var role = localStorage.getItem('vdd_admin_role')||'principal';
+  var name = localStorage.getItem('vdd_admin_name')||'Admin';
+  var form = localStorage.getItem('vdd_admin_formation')||'';
+
+  document.getElementById('sb-av').textContent = (name.split(' ').map(function(n){return n[0];}).join('')).toUpperCase();
+  document.getElementById('sb-name').textContent = name;
+  document.getElementById('sb-role').textContent = role==='mentor' ? '🧑‍🏫 Mentor' : '👑 Admin Principal';
+
+  if(role==='mentor'){
+    document.querySelectorAll('.admin-only').forEach(function(el){el.style.display='none';});
+    if(form) localStorage.setItem('vdd_filter_formation', form);
+  } else {
+    localStorage.removeItem('vdd_filter_formation');
+  }
+  loadData();
+}
+
+function init(){
+  if(localStorage.getItem('vdd_admin_logged')==='1') startDash();
+}
+
+// ── DATA ──────────────────────────────────────────────────────
+function loadData(){
+  allUsers = JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  renderDash(); renderUsers(); renderFormations(); renderStats(); renderNotifHist(); renderMentors();
+  var pending = allUsers.filter(function(u){return u.status==='pending'||!u.status;}).length;
+  var pc = document.getElementById('pcount');
+  pc.textContent = pending; pc.style.display = pending ? 'inline' : 'none';
+}
+
+function getProgress(u){
+  var prog = JSON.parse(localStorage.getItem('vdd_progress_'+u.email)||'{}');
+  var total = COURSE_CNT[u.formation]||5;
+  var done  = Object.values(prog).filter(Boolean).length;
+  return {done:done, total:total, pct:total?Math.round(done/total*100):0};
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDash(){
+  var tot=allUsers.length, act=allUsers.filter(function(u){return u.status==='active';}).length;
+  var pend=allUsers.filter(function(u){return u.status==='pending'||!u.status;}).length;
+  var blk=allUsers.filter(function(u){return u.status==='blocked';}).length;
+  document.getElementById('stats-row').innerHTML =
+    sc('👥',tot,'var(--navy)','Total apprenants')+
+    sc('✅',act,'var(--gn)','Comptes actifs')+
+    sc('⏳',pend,'var(--or)','En attente')+
+    sc('🚫',blk,'var(--rd)','Bloqués');
+
+  var pu = allUsers.filter(function(u){return u.status==='pending'||!u.status;}).slice(0,6);
+  document.getElementById('plist').innerHTML = pu.length
+    ? pu.map(function(u){ return urow(u,true); }).join('')
+    : empty('✅','Aucune inscription en attente');
+
+  var rec = allUsers.slice().reverse().slice(0,6);
+  document.getElementById('rlist').innerHTML = rec.length
+    ? rec.map(function(u){ return urow(u,false); }).join('')
+    : empty('👥','Aucun apprenant inscrit');
+}
+
+function sc(ico,val,col,lbl){
+  return '<div class="sc"><div class="ico">'+ico+'</div><div class="val" style="color:'+col+'">'+val+'</div><div class="lbl">'+lbl+'</div></div>';
+}
+function empty(ico,txt){
+  return '<div style="text-align:center;padding:36px;color:#94a3b8;font-family:\'Inter\',sans-serif;font-size:.85rem;"><div style="font-size:32px;margin-bottom:10px;">'+ico+'</div>'+txt+'</div>';
+}
+function urow(u,showActivate){
+  var ini = (u.prenom[0]+u.nom[0]).toUpperCase();
+  var bg  = showActivate ? 'linear-gradient(135deg,var(--or),#d97706)' : 'linear-gradient(135deg,var(--sky),var(--pur))';
+  return '<div style="padding:11px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:11px;">'+
+    '<div style="width:32px;height:32px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+ini+'</div>'+
+    '<div style="flex:1;"><div style="font-size:.82rem;font-weight:700;">'+u.prenom+' '+u.nom+'</div>'+
+    '<div style="font-family:\'Inter\',sans-serif;font-size:.7rem;color:var(--gr);">'+u.formation+'</div></div>'+
+    (showActivate ? '<button class="ba ba-act" onclick="activateUser(\''+u.email+'\')">Activer</button>' : '')+
+    '<button class="ba ba-wa" onclick="sendWA(\''+u.tel+'\',\''+u.prenom+'\',\''+u.email+'\',\''+(u.password||'')+'\')">💬</button>'+
+    '</div>';
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+function renderUsers(filter,search){
+  filter = filter||uFilter;
+  var users = allUsers.slice();
+  var mf = localStorage.getItem('vdd_filter_formation');
+  if(mf) users = users.filter(function(u){return u.formation===mf;});
+  if(filter!=='all') users = users.filter(function(u){
+    if(filter==='active') return u.status==='active';
+    if(filter==='pending') return u.status==='pending'||!u.status;
+    if(filter==='blocked') return u.status==='blocked';
+    return true;
+  });
+  if(search) users = users.filter(function(u){
+    return (u.prenom+' '+u.nom+' '+u.email+' '+u.formation).toLowerCase().indexOf(search.toLowerCase())>=0;
+  });
+  var tb = document.getElementById('utbody');
+  if(!users.length){ tb.innerHTML='<tr><td colspan="6">'+empty('👥','Aucun apprenant trouvé')+'</td></tr>'; return; }
+  tb.innerHTML = users.map(function(u){
+    var ini=(u.prenom[0]+u.nom[0]).toUpperCase();
+    var st = u.status||'pending';
+    var stBadge = st==='active'?'<span class="badge active">✅ Actif</span>':st==='blocked'?'<span class="badge blocked">🚫 Bloqué</span>':'<span class="badge pending">⏳ Attente</span>';
+    return '<tr>'+
+      '<td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--pur));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">'+ini+'</div>'+
+      '<div><div style="font-size:.82rem;font-weight:700;">'+u.prenom+' '+u.nom+'</div><div style="font-size:.7rem;color:var(--gr);font-family:\'Inter\',sans-serif;">'+u.tel+'</div></div></div></td>'+
+      '<td style="font-size:.8rem;font-family:\'Inter\',sans-serif;">'+u.email+'</td>'+
+      '<td><span style="background:rgba(0,180,216,.08);color:var(--cyan);border:1px solid rgba(0,180,216,.2);padding:3px 9px;border-radius:100px;font-size:.72rem;font-weight:700;">'+u.formation+'</span></td>'+
+      '<td>'+stBadge+'</td>'+
+      '<td style="font-size:.77rem;color:var(--gr);font-family:\'Inter\',sans-serif;">'+(u.dateInscription||'—')+'</td>'+
+      '<td><div class="ac">'+
+        '<button class="ba ba-v" onclick="viewUser(\''+u.email+'\')">👁 Voir</button>'+
+        (st!=='active'?'<button class="ba ba-act" onclick="activateUser(\''+u.email+'\')">✅</button>':'')+
+        (st==='active'?'<button class="ba ba-blk" onclick="blockUser(\''+u.email+'\')">🚫</button>':'')+
+        (st==='blocked'?'<button class="ba ba-ub" onclick="activateUser(\''+u.email+'\')">↩</button>':'')+
+        '<button class="ba ba-wa" onclick="sendWA(\''+u.tel+'\',\''+u.prenom+'\',\''+u.email+'\',\''+(u.password||'')+'\')">💬</button>'+
+      '</div></td></tr>';
+  }).join('');
+}
+
+function filterU(f,btn){ uFilter=f; document.querySelectorAll('.ft').forEach(function(b){b.classList.remove('active');}); btn.classList.add('active'); renderUsers(f); }
+function searchU(v){ renderUsers(uFilter,v); }
+
+// ── USER ACTIONS ──────────────────────────────────────────────
+function activateUser(email){
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  var idx=users.findIndex(function(u){return u.email===email;});
+  if(idx<0)return;
+  users[idx].status='active';
+  if(!users[idx].notifications) users[idx].notifications=[];
+  users[idx].notifications.unshift({id:Date.now(),text:'Votre compte a été activé ! Accédez à vos cours de "'+users[idx].formation+'".',date:new Date().toLocaleDateString('fr-FR'),read:false});
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+  showToast('✅ Compte activé !'); loadData();
+}
+
+function blockUser(email){
+  if(!confirm('Bloquer cet utilisateur ?'))return;
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  var idx=users.findIndex(function(u){return u.email===email;});
+  if(idx<0)return;
+  users[idx].status='blocked';
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+  showToast('🚫 Compte bloqué'); loadData();
+}
+
+function viewUser(email){
+  var u=allUsers.find(function(x){return x.email===email;});
+  if(!u)return;
+  var p=getProgress(u);
+  document.getElementById('modal-name').textContent=u.prenom+' '+u.nom;
+  var st=u.status||'pending';
+  document.getElementById('modal-body').innerHTML=
+    '<div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #f1f5f9;">'+
+      '<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--gr);margin-bottom:10px;">Informations</div>'+
+      row('📧','Email',u.email)+row('📱','Téléphone',u.tel||'—')+row('📚','Formation',u.formation)+row('📅','Inscription',u.dateInscription||'—')+row('🕐','Dernière connexion',u.lastLogin||'Jamais')+
+    '</div>'+
+    '<div style="margin-bottom:16px;">'+
+      '<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--gr);margin-bottom:8px;">Progression</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:5px;"><span>'+p.done+' cours sur '+p.total+'</span><strong style="color:var(--cyan);">'+p.pct+'%</strong></div>'+
+      '<div style="background:#e2e8f0;border-radius:100px;height:7px;overflow:hidden;"><div style="width:'+p.pct+'%;height:100%;background:linear-gradient(90deg,var(--sky),var(--lc));border-radius:100px;transition:width .8s;"></div></div>'+
+    '</div>'+
+    (!u.password ?
+      '<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:14px;">'+
+        '<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#c2410c;margin-bottom:8px;">🔑 Définir le mot de passe</div>'+
+        '<div style="display:flex;gap:8px;"><input type="text" id="view-pw" placeholder="Mot de passe..." style="flex:1;padding:10px 13px;border:1.5px solid #fed7aa;border-radius:8px;font-family:\'Sora\',sans-serif;font-size:.83rem;outline:none;"/>'+
+        '<button onclick="genPw(\'view-pw\',\'VDD\')" style="padding:10px 12px;background:#f97316;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;">🎲</button></div>'+
+        '<button onclick="setPw(\''+u.email+'\')" style="width:100%;margin-top:9px;padding:10px;background:linear-gradient(135deg,var(--gn),#16a34a);color:#fff;border:none;border-radius:9px;font-family:\'Sora\',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;">✅ Définir et envoyer par WhatsApp</button>'+
+      '</div>'
+      :
+      '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 13px;margin-bottom:14px;font-size:.82rem;color:#166534;font-family:\'Inter\',sans-serif;">✅ Mot de passe déjà défini. <button onclick="resetPw(\''+u.email+'\')" style="background:none;border:none;color:#2563eb;cursor:pointer;font-size:.8rem;text-decoration:underline;">Réinitialiser</button></div>'
+    )+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+      (st!=='active'?'<button class="ba ba-act" onclick="activateUser(\''+u.email+'\');closeModal()">✅ Activer</button>':'')+
+      (st==='active'?'<button class="ba ba-blk" onclick="blockUser(\''+u.email+'\');closeModal()">🚫 Bloquer</button>':'')+
+      (st==='blocked'?'<button class="ba ba-ub" onclick="activateUser(\''+u.email+'\');closeModal()">↩ Réactiver</button>':'')+
+      '<button class="ba ba-wa" onclick="sendWA(\''+u.tel+'\',\''+u.prenom+'\',\''+u.email+'\',\''+(u.password||'')+'\')">💬 WhatsApp</button>'+
+      '<button class="ba" style="background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2)!important;" onclick="deleteUser(\''+u.email+'\')">🗑 Supprimer</button>'+
+    '</div>';
+  document.getElementById('umodal').classList.add('open');
+}
+
+function row(ico,lbl,val){ return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;"><span style="font-size:16px;">'+ico+'</span><div><div style="font-size:.68rem;color:var(--gr);font-family:\'Inter\',sans-serif;">'+lbl+'</div><div style="font-size:.88rem;font-weight:600;">'+val+'</div></div></div>'; }
+
+function setPw(email){
+  var pw = document.getElementById('view-pw').value.trim();
+  if(!pw||pw.length<4){showToast('⚠️ Mot de passe trop court');return;}
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  var idx=users.findIndex(function(u){return u.email===email;});
+  if(idx<0)return;
+  users[idx].password=pw; users[idx].status='active';
+  if(!users[idx].notifications) users[idx].notifications=[];
+  users[idx].notifications.unshift({id:Date.now(),text:'Votre compte est activé ! Email: '+email+' | Mot de passe: '+pw,date:new Date().toLocaleDateString('fr-FR'),read:false});
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+  sendWAWithPw(users[idx].tel,users[idx].prenom,email,pw,users[idx].formation);
+  showToast('✅ Mot de passe défini !'); closeModal(); loadData();
+}
+
+function resetPw(email){
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  var idx=users.findIndex(function(u){return u.email===email;});
+  if(idx<0)return;
+  users[idx].password=''; users[idx].status='pending';
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+  showToast('Mot de passe réinitialisé'); closeModal(); loadData();
+}
+
+function deleteUser(email){
+  if(!confirm('Supprimer définitivement cet utilisateur ?'))return;
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  localStorage.setItem('vdd_users',JSON.stringify(users.filter(function(u){return u.email!==email;})));
+  showToast('🗑 Supprimé'); closeModal(); loadData();
+}
+
+function closeModal(){ document.getElementById('umodal').classList.remove('open'); }
+document.getElementById('umodal').addEventListener('click',function(e){if(e.target.id==='umodal')closeModal();});
+
+// ── FORMATIONS ────────────────────────────────────────────────
+function renderFormations(){
+  document.getElementById('ftbody').innerHTML = FORMATIONS.map(function(f){
+    var ins=allUsers.filter(function(u){return (u.formations||[u.formation]).indexOf(f)>=0;});
+    var act=ins.filter(function(u){return u.status==='active';});
+    var pend=ins.filter(function(u){return u.status==='pending'||!u.status;});
+    var avg=act.length?Math.round(act.reduce(function(s,u){var p=getProgress(Object.assign({},u,{formation:f}));return s+p.pct;},0)/act.length):0;
+    return '<tr><td><strong>'+f+'</strong></td><td>'+ins.length+'</td>'+
+      '<td><span class="badge active">'+act.length+'</span></td>'+
+      '<td><span class="badge pending">'+pend.length+'</span></td>'+
+      '<td><div style="display:flex;align-items:center;gap:7px;"><div class="pb"><div class="pf" style="width:'+avg+'%"></div></div><span style="font-size:.72rem;font-weight:700;color:var(--cyan);">'+avg+'%</span></div></td></tr>';
+  }).join('');
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+function renderStats(){
+  var act=allUsers.filter(function(u){return u.status==='active';});
+  var distrib=FORMATIONS.map(function(f){return {f:f,n:allUsers.filter(function(u){return (u.formations||[u.formation]).indexOf(f)>=0;}).length};}).filter(function(x){return x.n>0;}).sort(function(a,b){return b.n-a.n;});
+  var mx=distrib[0]?distrib[0].n:1;
+  document.getElementById('chart-row').innerHTML=
+    '<div class="cb"><h4>👥 Apprenants par formation</h4>'+distrib.map(function(d){return '<div class="bi"><span class="bl">'+d.f+'</span><div class="bt"><div class="bf" style="width:'+Math.round(d.n/mx*100)+'%"></div></div><span class="bv">'+d.n+'</span></div>';}).join('')+'</div>'+
+    '<div class="cb"><h4>📊 Répartition statuts</h4>'+[
+      {l:'✅ Actifs',n:allUsers.filter(function(u){return u.status==='active';}).length,c:'#22c55e'},
+      {l:'⏳ En attente',n:allUsers.filter(function(u){return u.status==='pending'||!u.status;}).length,c:'#f59e0b'},
+      {l:'🚫 Bloqués',n:allUsers.filter(function(u){return u.status==='blocked';}).length,c:'#ef4444'}
+    ].map(function(d){return '<div class="bi"><span class="bl">'+d.l+'</span><div class="bt"><div class="bf" style="width:'+(allUsers.length?Math.round(d.n/allUsers.length*100):0)+'%;background:'+d.c+'"></div></div><span class="bv">'+d.n+'</span></div>';}).join('')+'</div>';
+
+  document.getElementById('ptbody').innerHTML=act.length
+    ?act.map(function(u){var p=getProgress(u);return '<tr><td><strong>'+u.prenom+' '+u.nom+'</strong></td><td>'+u.formation+'</td><td>'+p.done+'/'+p.total+'</td><td><div style="display:flex;align-items:center;gap:7px;"><div class="pb"><div class="pf" style="width:'+p.pct+'%"></div></div><span style="font-size:.72rem;font-weight:700;color:var(--cyan);">'+p.pct+'%</span></div></td><td style="font-size:.77rem;color:var(--gr);font-family:\'Inter\',sans-serif;">'+(u.lastLogin||'Jamais')+'</td></tr>';}).join('')
+    :'<tr><td colspan="5">'+empty('','Aucun apprenant actif')+'</td></tr>';
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+function sendNotif(){
+  var tgt=document.getElementById('n-target').value;
+  var title=document.getElementById('n-title').value.trim();
+  var text=document.getElementById('n-text').value.trim();
+  if(!title||!text){showToast('⚠️ Remplissez le titre et le message');return;}
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  var targets=tgt==='all'?users:tgt==='active'?users.filter(function(u){return u.status==='active';}):users.filter(function(u){return u.status==='pending'||!u.status;});
+  targets.forEach(function(u){if(!u.notifications)u.notifications=[];u.notifications.unshift({id:Date.now(),text:'📢 '+title+' – '+text,date:new Date().toLocaleDateString('fr-FR'),read:false});});
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+  notifHist.unshift({title:title,text:text,target:tgt,date:new Date().toLocaleDateString('fr-FR'),count:targets.length});
+  localStorage.setItem('vdd_notif_hist',JSON.stringify(notifHist));
+  document.getElementById('n-title').value=''; document.getElementById('n-text').value='';
+  showToast('✅ Notification envoyée à '+targets.length+' apprenant(s)');
+  renderNotifHist();
+}
+
+function renderNotifHist(){
+  var el=document.getElementById('nhistory');
+  if(!el)return;
+  el.innerHTML=notifHist.length
+    ?notifHist.map(function(n){return '<div style="padding:12px 16px;border-bottom:1px solid #f1f5f9;"><div style="font-size:.85rem;font-weight:700;">'+n.title+'</div><div style="font-family:\'Inter\',sans-serif;font-size:.77rem;color:var(--gr);margin-top:3px;">'+n.text+'</div><div style="font-family:\'Inter\',sans-serif;font-size:.7rem;color:var(--gr);margin-top:4px;">'+n.date+' · '+n.count+' destinataire(s)</div></div>';}).join('')
+    :empty('🔔','Aucune notification envoyée');
+}
+
+// ── CRÉER UN COMPTE ───────────────────────────────────────────
+function genPw(id,prefix){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@!';
+  var pw=prefix||'VDD';
+  for(var i=0;i<5;i++) pw+=chars[Math.floor(Math.random()*chars.length)];
+  var el=document.getElementById(id); if(el) el.value=pw;
+}
+
+function creerCompte(){
+  var prenom=document.getElementById('c-prenom').value.trim();
+  var nom=document.getElementById('c-nom').value.trim();
+  var email=document.getElementById('c-email').value.trim();
+  var tel=document.getElementById('c-tel').value.trim();
+  var formation=document.getElementById('c-formation').value;
+  var pw=document.getElementById('c-pw').value.trim();
+  var err=document.getElementById('c-err'); var ok=document.getElementById('c-ok');
+  err.style.display='none'; ok.style.display='none';
+
+  if(!prenom||!nom||!email||!tel||!formation){err.textContent='⚠️ Tous les champs obligatoires doivent être remplis.';err.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='⚠️ Email invalide.';err.style.display='block';return;}
+
+  if(!pw){ genPw('c-pw','VDD'); pw=document.getElementById('c-pw').value; }
+
+  var users=JSON.parse(localStorage.getItem('vdd_users')||'[]');
+  if(users.find(function(u){return u.email===email;})){err.textContent='⚠️ Cet email est déjà utilisé.';err.style.display='block';return;}
+
+  var user={prenom:prenom,nom:nom,email:email,tel:tel,formation:formation,password:pw,
+    dateInscription:new Date().toLocaleDateString('fr-FR'),status:'active',
+    formations:[formation],notifications:[{id:Date.now(),text:'Bienvenue ! Votre compte est actif pour la formation "'+formation+'". Email: '+email+' | Mot de passe: '+pw,date:new Date().toLocaleDateString('fr-FR'),read:false}],
+    docs:[],certs:[],lastLogin:null};
+  users.push(user);
+  localStorage.setItem('vdd_users',JSON.stringify(users));
+
+  var clean=tel.replace(/[^0-9]/g,'');
+  var intl=clean.startsWith('221')?clean:'221'+clean;
+  var waUrl='https://wa.me/'+intl+'?text='+encodeURIComponent(`🎓 *Vision du Digital*
+
+Bonjour ${prenom} ${nom} ! 👋
+
+✅ *Votre compte est activé !*
+
+*Identifiants de connexion :*
+📧 Email : ${email}
+🔑 Mot de passe : ${pw}
+📚 Formation : ${formation}
+
+🔗 Accédez à vos cours :
+https://vision-du-digital.netlify.app/espace-cours.html
+
+⚠️ Conservez ces informations !
+_Équipe Vision du Digital_`);
+
+  ok.innerHTML='✅ Compte créé pour <strong>'+prenom+' '+nom+'</strong> !<br/><a href="'+waUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:9px 18px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border-radius:9px;text-decoration:none;font-family:\'Sora\',sans-serif;font-size:.83rem;font-weight:700;">💬 Envoyer les accès par WhatsApp</a>';
+  ok.style.display='block';
+  ['c-prenom','c-nom','c-email','c-tel','c-pw'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('c-formation').selectedIndex=0;
+  showToast('✅ Compte créé !'); loadData();
+}
+
+// ── MENTORS ───────────────────────────────────────────────────
+function ajouterMentor(){
+  var prenom=document.getElementById('m-prenom').value.trim();
+  var nom=document.getElementById('m-nom').value.trim();
+  var email=document.getElementById('m-email').value.trim();
+  var tel=document.getElementById('m-tel').value.trim();
+  var formation=document.getElementById('m-formation').value;
+  var pw=document.getElementById('m-pw').value.trim();
+  var err=document.getElementById('m-err'); var ok=document.getElementById('m-ok');
+  err.style.display='none'; ok.style.display='none';
+
+  if(!prenom||!nom||!email||!formation){err.textContent='⚠️ Prénom, Nom, Email et Formation sont obligatoires.';err.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='⚠️ Email invalide.';err.style.display='block';return;}
+  if(!pw){ genPw('m-pw','Mentor'); pw=document.getElementById('m-pw').value; }
+
+  var mentors=JSON.parse(localStorage.getItem('vdd_mentors')||'[]');
+  if(mentors.find(function(m){return m.email===email;})){err.textContent='⚠️ Ce mentor existe déjà.';err.style.display='block';return;}
+
+  mentors.push({prenom:prenom,nom:nom,email:email,tel:tel,formation:formation,password:pw,dateAjout:new Date().toLocaleDateString('fr-FR')});
+  localStorage.setItem('vdd_mentors',JSON.stringify(mentors));
+  ok.textContent='✅ Mentor '+prenom+' '+nom+' ajouté !'; ok.style.display='block';
+  ['m-prenom','m-nom','m-email','m-tel','m-pw'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-formation').selectedIndex=0;
+  showToast('✅ Mentor ajouté !'); renderMentors();
+}
+
+function renderMentors(){
+  var mentors=JSON.parse(localStorage.getItem('vdd_mentors')||'[]');
+  var el=document.getElementById('mlist'); if(!el)return;
+  el.innerHTML=mentors.length
+    ?mentors.map(function(m,i){
+      return '<div style="padding:12px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px;">'+
+        '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--pur),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">'+(m.prenom[0]+m.nom[0]).toUpperCase()+'</div>'+
+        '<div style="flex:1;"><div style="font-size:.87rem;font-weight:700;">'+m.prenom+' '+m.nom+'</div>'+
+        '<div style="font-family:\'Inter\',sans-serif;font-size:.73rem;color:var(--gr);">'+m.email+' · '+m.formation+'</div></div>'+
+        '<span style="background:rgba(99,102,241,.1);color:var(--pur);border:1px solid rgba(99,102,241,.2);padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:700;">🧑‍🏫 Mentor</span>'+
+        '<button onclick="supprimerMentor('+i+')" class="ba ba-blk">Supprimer</button>'+
+      '</div>';
+    }).join('')
+    :empty('🧑‍🏫','Aucun mentor ajouté');
+}
+
+function supprimerMentor(i){
+  if(!confirm('Supprimer ce mentor ?'))return;
+  var mentors=JSON.parse(localStorage.getItem('vdd_mentors')||'[]');
+  mentors.splice(i,1);
+  localStorage.setItem('vdd_mentors',JSON.stringify(mentors));
+  showToast('Mentor supprimé'); renderMentors();
+}
+
+// ── WHATSAPP ──────────────────────────────────────────────────
+function sendWA(tel,prenom,email,password){
+  if(!tel){showToast('Numéro non disponible');return;}
+  var clean=tel.replace(/[^0-9]/g,'');
+  var intl=clean.startsWith('221')?clean:'221'+clean;
+  var msg=encodeURIComponent(`🎓 *Vision du Digital*
+
+Bonjour ${prenom} ! 👋
+
+✅ *Votre compte est activé !*
+
+📧 Email : ${email}
+🔑 Mot de passe : ${password||'(non défini)'}
+
+🔗 Accédez à vos cours :
+https://vision-du-digital.netlify.app/espace-cours.html
+
+_Équipe Vision du Digital_`);
+  window.open('https://wa.me/'+intl+'?text='+msg,'_blank');
+}
+
+function sendWAWithPw(tel,prenom,email,pw,formation){
+  var clean=(tel||'').replace(/[^0-9]/g,'');
+  var intl=clean.startsWith('221')?clean:'221'+clean;
+  var msg=encodeURIComponent(`🎓 *Vision du Digital*
+
+Bonjour ${prenom} ! 👋
+
+✅ *Compte activé !*
+
+📧 Email : ${email}
+🔑 Mot de passe : ${pw}
+📚 Formation : ${formation}
+
+🔗 https://vision-du-digital.netlify.app/espace-cours.html
+
+_Équipe Vision du Digital_`);
+  window.open('https://wa.me/'+intl+'?text='+msg,'_blank');
+}
+
+// ── UI ────────────────────────────────────────────────────────
+function showSec(s,btn){
+  document.querySelectorAll('.section').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('s-'+s).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(function(el){el.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  var titles={dashboard:'Tableau de bord',users:'Apprenants',formations:'Formations',stats:'Statistiques',notifs:'Notifications',creer:'Créer un compte',mentors:'Mentors'};
+  document.getElementById('tb-title').textContent=titles[s]||s;
+  loadData();
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+
+init();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+.
