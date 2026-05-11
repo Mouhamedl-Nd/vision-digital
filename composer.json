@@ -1,0 +1,7 @@
+{
+  "name": "vision-digital/api",
+  "description": "API Backend Vision du Digital",
+  "require": {
+    "php": ">=8.0"
+  }
+}
